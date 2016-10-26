@@ -38,14 +38,12 @@ public class TicTacToePlayerController {
   public static char O_MARK = 'O';
   public static char EMPTY = 'I';
 
-  /*
   private final TicTacToePlayerProperties ticTacToePlayerProperties;
 
   @Autowired
   public TicTacToePlayerController(TicTacToePlayerProperties ticTacToePlayerProperties) {
     this.ticTacToePlayerProperties = ticTacToePlayerProperties;
   }
-  */
 
   /**
    * The state of the game board
@@ -127,6 +125,10 @@ public class TicTacToePlayerController {
    * Strategy that consults a neural network server trained for tic tac toe
    */
   private void consultNeuralNetwork() {
+    String values = "1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0";
+    String url = this.ticTacToePlayerProperties.getNeuralNetworkServiceUrl(values);
+    System.out.println("url: " + url);
+
     boolean played = false;
     while (!played) {
       int proposedCellIndex = (int)(Math.random() * NUM_CELLS);

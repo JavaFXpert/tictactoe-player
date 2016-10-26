@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 /**
  * @author James L. Weaver (Twitter: @JavaFXpert)
  */
-@ConfigurationProperties(prefix = "conceptmap")
+@ConfigurationProperties(prefix = "tictactoe")
 @Component
 public class TicTacToePlayerProperties {
 
@@ -49,7 +49,7 @@ public class TicTacToePlayerProperties {
    *
    */
   public String getNeuralNetworkServiceUrl(String values) {
-    String url = getNeuralNetworkHost() + String.format(this.getNeuralNetworkEndpoint(), values);
+    String url = this.getNeuralNetworkHost() + String.format(this.getNeuralNetworkEndpoint(), values);
     return url;
   }
 
