@@ -15,8 +15,42 @@
  */
 package javafxpert.tactactoe.player;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
 /**
  * @author James L. Weaver (Twitter: @JavaFXpert)
  */
+@ConfigurationProperties(prefix = "conceptmap")
+@Component
 public class TicTacToePlayerProperties {
+
+  private String neuralNetworkHost;
+  private String neuralNetworkEndpoint;
+
+  public String getNeuralNetworkEndpoint() {
+    return neuralNetworkEndpoint;
+  }
+
+  public void setNeuralNetworkEndpoint(String neuralNetworkEndpoint) {
+    this.neuralNetworkEndpoint = neuralNetworkEndpoint;
+  }
+
+  public String getNeuralNetworkHost() {
+    return neuralNetworkHost;
+  }
+
+  public void setNeuralNetworkHost(String neuralNetworkHost) {
+    this.neuralNetworkHost = neuralNetworkHost;
+  }
+
+  /**
+   * Provide the URL to the neural network service
+   *
+   */
+  public String getNeuralNetworkServiceUrl(String values) {
+    String url = getNeuralNetworkHost() + String.format(this.getNeuralNetworkEndpoint(), values);
+    return url;
+  }
+
 }

@@ -63,6 +63,10 @@ public class TicTacToePlayerController {
    *
    * Example endpoint usage /player?gameBoard=XIIIOIOOX&strategy=playRandomCell
    *
+   * Available strategy values are:
+   *   - default
+   *   - neuralNetwork
+   *
    * @param gameBoardStr
    * @param strategy
    * @return the updated representation of the game board
@@ -91,6 +95,9 @@ public class TicTacToePlayerController {
       if (strategy.equalsIgnoreCase("default")) {
         playFirstEmptyCell();
       }
+      else if (strategy.equalsIgnoreCase("neuralNetwork")) {
+        consultNeuralNetwork();
+      }
 
       playerResponse.setGameBoardStr(gameBoard.toString());
 
@@ -114,6 +121,20 @@ public class TicTacToePlayerController {
    */
   private void playFirstEmptyCell() {
     gameBoard.setCharAt(gameBoard.indexOf(Character.toString(EMPTY)), whoseTurn);
+  }
+
+  /**
+   * Strategy that consults a neural network server trained for tic tac toe
+   */
+  private void consultNeuralNetwork() {
+    boolean played = false;
+    while (!played) {
+      int proposedCellIndex = (int)(Math.random() * NUM_CELLS);
+      if (gameBoard.charAt(proposedCellIndex) == EMPTY) {
+        gameBoard.setCharAt(proposedCellIndex, whoseTurn);
+        played = true;
+      }
+    }
   }
 
   /**
