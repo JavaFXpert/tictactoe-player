@@ -16,6 +16,7 @@
 package javafxpert.tactactoe.player;
 
 import javafxpert.tactactoe.player.model.PlayerResponse;
+import javafxpert.tactactoe.player.model.PredictionResponseFar;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,7 +25,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
 import java.util.Optional;
 
 /**
@@ -125,18 +128,59 @@ public class TicTacToePlayerController {
    * Strategy that consults a neural network server trained for tic tac toe
    */
   private void consultNeuralNetwork() {
-    String values = "1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0";
-    String url = this.ticTacToePlayerProperties.getNeuralNetworkServiceUrl(values);
-    System.out.println("url: " + url);
+    String values = "";
+    for (int i = 0; i < NUM_CELLS; i++) {
+      values += getOneHotStringForMark(gameBoard.charAt(i));
 
-    boolean played = false;
-    while (!played) {
-      int proposedCellIndex = (int)(Math.random() * NUM_CELLS);
-      if (gameBoard.charAt(proposedCellIndex) == EMPTY) {
-        gameBoard.setCharAt(proposedCellIndex, whoseTurn);
-        played = true;
+      // Append a comma on all but the last entries
+      if (i < NUM_CELLS - 1) {
+        values += ",";
       }
     }
+    String predictionRequestUrl = this.ticTacToePlayerProperties.getNeuralNetworkServiceUrl(values);
+    System.out.println("predictionRequestUrl: " + predictionRequestUrl);
+
+    PredictionResponseFar predictionResponseFar = null;
+    try {
+      predictionResponseFar = new RestTemplate().getForObject(new URI(predictionRequestUrl),
+          PredictionResponseFar.class);
+
+      // TODO: Instead of using the prediction element returned, use the activations
+      //       and randomly pick from the highest ones
+
+
+      // TODO: If the prediction (or all of the activation) cells are already taken on the
+      //       board, choose a random cell
+      int prediction = predictionResponseFar.getPrediction();
+      System.out.println("prediction is: " + prediction);
+      if (gameBoard.charAt(prediction) == EMPTY) {
+        gameBoard.setCharAt(prediction, whoseTurn);
+      }
+      else {
+        playFirstEmptyCell();
+      }
+
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+      System.out.println("Caught exception when calling neural network prediction service " + e);
+    }
+  }
+
+  /**
+   * Given a mark (X, O, or empty), return a string represention of a one-hot vector
+   * @param mark
+   * @return
+   */
+  private String getOneHotStringForMark(char mark) {
+    String oneHotString = "1,0,0"; // Default to representation for empty cell
+    if (mark == X_MARK) {
+      oneHotString = "0,1,0";
+    }
+    else if (mark == X_MARK) {
+      oneHotString = "0,0,1";
+    }
+    return oneHotString;
   }
 
   /**
