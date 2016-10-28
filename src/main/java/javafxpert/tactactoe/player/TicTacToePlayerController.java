@@ -160,7 +160,7 @@ public class TicTacToePlayerController {
       int randomHighestOutputActivationIndex = getRandomOfHighestOutputActivations(activations);
       System.out.println("randomHighestOutputActivationIndex is: " + randomHighestOutputActivationIndex);
 
-      if (gameBoard.charAt(prediction) == EMPTY) {
+      if (gameBoard.charAt(randomHighestOutputActivationIndex) == EMPTY) {
         gameBoard.setCharAt(randomHighestOutputActivationIndex, whoseTurn);
       }
       else {
