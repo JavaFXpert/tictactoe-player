@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author James L. Weaver (Twitter: @JavaFXpert)
@@ -40,6 +40,8 @@ public class TicTacToePlayerController {
   public static char X_MARK = 'X';
   public static char O_MARK = 'O';
   public static char EMPTY = 'I';
+
+  public static double HIGHEST_VALUES_TOLERENCE = 0.05;
 
   private final TicTacToePlayerProperties ticTacToePlayerProperties;
 
@@ -153,8 +155,13 @@ public class TicTacToePlayerController {
       //       board, choose a random cell
       int prediction = predictionResponseFar.getPrediction();
       System.out.println("prediction is: " + prediction);
+
+      List<Double> activations = predictionResponseFar.getActivations();
+      int randomHighestOutputActivationIndex = getRandomOfHighestOutputActivations(activations);
+      System.out.println("randomHighestOutputActivationIndex is: " + randomHighestOutputActivationIndex);
+
       if (gameBoard.charAt(prediction) == EMPTY) {
-        gameBoard.setCharAt(prediction, whoseTurn);
+        gameBoard.setCharAt(randomHighestOutputActivationIndex, whoseTurn);
       }
       else {
         playFirstEmptyCell();
@@ -177,10 +184,33 @@ public class TicTacToePlayerController {
     if (mark == X_MARK) {
       oneHotString = "0,1,0";
     }
-    else if (mark == X_MARK) {
+    else if (mark == O_MARK) {
       oneHotString = "0,0,1";
     }
     return oneHotString;
+  }
+
+  /**
+   * From the nine output activations in the given list of activations, find the
+   * ones with virtually equally highest values (with a certain % of the highest value),
+   * and return a random choice among them.
+   * @param activations
+   * @return the zero-based index of a tic-tac-toe cell number
+   */
+  private int getRandomOfHighestOutputActivations(List<Double> activations) {
+    int outputActivationsStartIndex = activations.size() - NUM_CELLS;
+    List<Double> outputActivations = activations.subList(outputActivationsStartIndex, activations.size());
+
+    double highestActivation = Collections.max(outputActivations);
+    List<Integer> indexOfHighestOutputActivations = new ArrayList<>();
+    for (int i = 0; i < outputActivations.size(); i++) {
+      if (highestActivation - outputActivations.get(i) < (highestActivation * HIGHEST_VALUES_TOLERENCE)) {
+        indexOfHighestOutputActivations.add(i);
+      }
+    }
+
+    int randomIndex = (int)(indexOfHighestOutputActivations.size() * Math.random());
+    return indexOfHighestOutputActivations.get(randomIndex);
   }
 
   /**
