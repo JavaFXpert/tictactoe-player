@@ -41,7 +41,7 @@ public class TicTacToePlayerController {
   public static char O_MARK = 'O';
   public static char EMPTY = 'I';
 
-  public static double HIGHEST_VALUES_TOLERENCE = 0.05;
+  public static double HIGHEST_VALUES_TOLERENCE = 0.1;
 
   private final TicTacToePlayerProperties ticTacToePlayerProperties;
 
